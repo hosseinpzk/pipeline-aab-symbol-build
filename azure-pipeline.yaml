@@ -1,0 +1,31 @@
+trigger:
+  - main
+
+pool:
+  name: 'YOUR POOL AGENT NAME'  # Agent pool for building the Unity project
+
+steps:
+  - checkout: self  # Check out the repository
+    persistCredentials: true  # Keep credentials for further tasks
+    clean: true  # Clean the workspace before building
+
+  - script: |
+     "C:\Program Files\Unity\Hub\Editor\2022.3.43f1\Editor\Unity.exe" -quit -batchmode -projectPath "$(Build.SourcesDirectory)" -executeMethod BuildScript.BuildAAB -logFile "$(Build.ArtifactStagingDirectory)/unity.log"
+    displayName: 'Build AAB using Unity'  # Run the Unity build process
+
+  - task: CopyFiles@2
+    inputs:
+     SourceFolder: 'C:\agent\_work\1\a'  # Source folder for AAB file
+     Contents: '*.aab'  # Copy AAB files only
+     TargetFolder: 'C:\Users\USERNAME\Desktop\Builds'  # Target directory on USERNAME desktop
+    displayName: 'Copy AAB to Desktop'  # Task to copy AAB file
+  
+  - task: CopyFiles@2
+    inputs:
+     SourceFolder: 'C:\Users\USERNAME\Downloads\agent\_work\1\s\Library\Bee\Android\Prj\IL2CPP'  # Source for symbols.zip
+     Contents: 'symbols.zip'  # Copy the symbols file
+     TargetFolder: 'C:\Users\USERNAME\Desktop\Builds'  # Target directory on desktop
+    displayName: 'Copy Symbols to Desktop'  # Task to copy symbols file
+
+  - script: type "$(Build.ArtifactStagingDirectory)\unity.log"
+    displayName: 'Show Unity Log'  # Display the Unity build log
