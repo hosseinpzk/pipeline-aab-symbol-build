@@ -1,3 +1,5 @@
+# Create azure-pipeline.yaml file in root of repository then write this code in it
+
 trigger:
   - main
 
